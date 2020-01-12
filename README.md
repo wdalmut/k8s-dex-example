@@ -39,6 +39,63 @@ Now we are ready to deploy Dex
 
 ```sh
 kubectl apply -f dex.yaml
+NAME                   READY   STATUS    RESTARTS   AGE
+dex-77bcfc5588-8rvhd   1/1     Running   0          3h8m
+dex-77bcfc5588-njb46   1/1     Running   0          3h8m
+dex-77bcfc5588-wdpwr   1/1     Running   0          3h8m
+```
+
+## Login from the CLI
+
+First of all you need the `oidc-login` plugin
+(https://github.com/int128/kubelogin) (grab the binary and put it into the bin
+folder)
+
+Then update your `~/.kube/config` configuration file with a new user (_users
+section_)
+
+```yaml
+- name: oidc
+  user:
+    exec:
+      apiVersion: client.authentication.k8s.io/v1beta1
+      args:
+      - oidc-login
+      - get-token
+      - --oidc-issuer-url=ISSUER_URL
+      - --oidc-client-id=CLIENT_ID
+      - --oidc-client-secret=OIDC_SECRET
+      - --certificate-authority=CA_ABSOLUTE_PATH
+      - --oidc-extra-scope=email
+      - --oidc-extra-scope=profile
+      - --oidc-extra-scope=groups
+      command: kubectl
+      env: null
+```
+
+Then set this new user as the current user
+
+```sh
+kubectl config set-context --user oidc --current
+```
+
+And try to use the cluster
+
+```sh
+kubectl get pods
+Open http://localhost:8000 for authentication
+
+NAME                   READY   STATUS    RESTARTS   AGE
+dex-77bcfc5588-8rvhd   1/1     Running   0          3h8m
+dex-77bcfc5588-njb46   1/1     Running   0          3h8m
+dex-77bcfc5588-wdpwr   1/1     Running   0          3h8m
+```
+
+or try to get our deployments
+
+```sh
+kubectl get deployments
+Error from server (Forbidden): deployments.apps is forbidden: User "walter.dalmut@gmail.com" cannot list resource "deployments" in API group "apps" in the namespace "default"
 ```
 
 ## Login App
@@ -57,6 +114,8 @@ quay.io/fydrah/loginapp:2.7.0 serve /config-loginapp-docker.yaml
 ---
 
 Setup reference: https://github.com/dexidp/dex/blob/master/Documentation/kubernetes.md#configuring-the-openid-connect-plugin
+
+Here the project: https://github.com/fydrah/loginapp
 
 ## Play with RBAC
 

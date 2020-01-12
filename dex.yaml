@@ -82,6 +82,8 @@ data:
     staticClients:
     - id: example-app
       redirectURIs:
+      - 'http://localhost:8000'
+      - 'http://localhost:18000'
       - 'https://loginapp.192.168.1.110.xip.io:5555/callback'
       name: 'Example App'
       secret: ZXhhbXBsZS1hcHAtc2VjcmV0
