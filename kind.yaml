@@ -1,0 +1,36 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+kubeadmConfigPatches:
+- |
+  apiVersion: kubeadm.k8s.io/v1beta2
+  kind: ClusterConfiguration
+  metadata:
+    name: config
+  apiServer:
+    extraArgs:
+      oidc-issuer-url: https://dex.192.168.1.110.xip.io:32000
+      oidc-client-id: example-app
+      oidc-ca-file: /etc/ssl/certs/ca.pem
+      oidc-username-claim: email
+      oidc-groups-claim: groups
+nodes:
+- role: control-plane
+  extraMounts:
+  - hostPath: ssl
+    containerPath: /etc/ssl/certs
+  extraPortMappings:
+  - containerPort: 32000
+    hostPort: 32000
+- role: control-plane
+  extraMounts:
+  - hostPath: ssl
+    containerPath: /etc/ssl/certs
+- role: control-plane
+  extraMounts:
+  - hostPath: ssl
+    containerPath: /etc/ssl/certs
+- role: worker
+- role: worker
+- role: worker
+- role: worker
+- role: worker
